@@ -4,10 +4,14 @@ import { useRouter } from "vue-router";
 import UiButton from "@/components/Ui-Button.vue";
 import useStore from "@/stores/store";
 
+interface Entry {
+  name: string;
+}
+
 const router = useRouter();
 const { counter, getCardDeck, setCardDeck, deckCards, setCounter } = useStore();
 const selectable = ref(false);
-const selectedCards = reactive<Map>(new Map());
+const selectedCards = reactive<Map<Number, Entry>>(new Map());
 const allCardsOpened = ref(true);
 const cardsCount = computed(() => deckCards.value.filter((item) => item !== null).length);
 const nullableCardsCount = computed(() => deckCards.value.filter((item) => item === null).length);
@@ -33,7 +37,7 @@ function handleEndGame() {
  */
 function hideSelectedCards() {
   const availableCards = deckCards.value.map((deckCard, index) => {
-    if (selectedCards.has(index) && selectedCards.get(index).name === deckCard) {
+    if (selectedCards.has(index) && selectedCards?.get(index)?.name === deckCard) {
       return null;
     }
     return deckCard;
@@ -66,7 +70,7 @@ function handleSelectCard(card: string | null, index: number) {
   if (!isCardOpened(card, index)) selectedCards.set(index, { name: card });
 
   if (selectedCards.size === 2) {
-    const cardNames = Array.from(selectedCards).map((entry) => entry[1].name);
+    const cardNames = Array.from(selectedCards).map((entry: [Number, Entry]) => entry[1].name);
 
     selectable.value = false;
 
@@ -96,7 +100,7 @@ function handleSelectCard(card: string | null, index: number) {
 function isCardOpened(card: string | null, index: number) {
   if (card === null) return false;
 
-  return selectedCards.has(index) && selectedCards.get(index).name === card;
+  return selectedCards.has(index) && selectedCards?.get(index)?.name === card;
 }
 </script>
 
